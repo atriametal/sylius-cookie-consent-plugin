@@ -28,6 +28,7 @@ final class PurgeConsentRecordsCommandTest extends KernelTestCase
 {
     public function testItRemovesTheRecordsOlderThanTheRetentionPeriod(): void
     {
+        $kernel = self::bootKernel();
         $entityManager = self::getContainer()->get('doctrine.orm.entity_manager');
         self::assertInstanceOf(EntityManagerInterface::class, $entityManager);
         $entityManager->createQuery(\sprintf('DELETE FROM %s', ConsentRecord::class))->execute();
@@ -39,7 +40,7 @@ final class PurgeConsentRecordsCommandTest extends KernelTestCase
         $entityManager->flush();
         $entityManager->clear();
 
-        $command = new CommandTester((new Application(self::$kernel ?? self::bootKernel()))->find('cookie-consent:purge-records'));
+        $command = new CommandTester((new Application($kernel))->find('cookie-consent:purge-records'));
         $command->execute([]);
 
         $command->assertCommandIsSuccessful();
