@@ -18,6 +18,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RequestContextAwareInterface;
 use Twig\Environment;
 
 /**
@@ -104,6 +105,10 @@ final class ShopTemplatesTest extends KernelTestCase
         $requestStack = self::getContainer()->get('request_stack');
         self::assertInstanceOf(RequestStack::class, $requestStack);
         $requestStack->push($request);
+        // Set by the LocaleListener of Symfony on a real request
+        $router = self::getContainer()->get('router');
+        self::assertInstanceOf(RequestContextAwareInterface::class, $router);
+        $router->getContext()->setParameter('_locale', 'en_US');
 
         $twig = self::getContainer()->get('twig');
         self::assertInstanceOf(Environment::class, $twig);
