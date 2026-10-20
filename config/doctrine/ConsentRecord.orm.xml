@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <mapped-superclass name="Atriametal\SyliusCookieConsentPlugin\Entity\ConsentRecord" table="atriametal_cookie_consent_record">
+        <indexes>
+            <index name="atriametal_cookie_consent_record_consent_id_idx" columns="consent_id"/>
+            <index name="atriametal_cookie_consent_record_created_at_idx" columns="created_at"/>
+        </indexes>
+
+        <id name="id" type="integer">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <field name="consentId" column="consent_id" type="string" length="36"/>
+        <field name="policyVersion" column="policy_version" type="string" length="64"/>
+        <field name="categories" type="json"/>
+        <field name="createdAt" column="created_at" type="datetime_immutable"/>
+        <field name="channelCode" column="channel_code" type="string" nullable="true"/>
+    </mapped-superclass>
+</doctrine-mapping>

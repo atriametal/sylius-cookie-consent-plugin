@@ -1,0 +1,102 @@
+{#
+ # The banner and the preferences are hidden until the browser script knows whether the visitor has consented:
+ # without JavaScript, nothing is unblocked, so there is nothing to ask.
+ #}
+{% set privacy_policy_url = cookie_consent_privacy_policy_url() %}
+{% set optional_categories = cookie_consent_categories()|filter(category => not category.required) %}
+
+<div class="cookie-consent" data-cookie-consent-root data-config="{{ cookie_consent_client_config()|json_encode }}">
+    <section class="cookie-consent__banner" data-cookie-consent-banner aria-labelledby="cookie-consent-title" aria-describedby="cookie-consent-text" hidden>
+        <div class="cookie-consent__banner-inner">
+            <div class="cookie-consent__body">
+                <h2 class="cookie-consent__title" id="cookie-consent-title">{{ 'atriametal_cookie_consent.banner.title'|trans }}</h2>
+                <p class="cookie-consent__text" id="cookie-consent-text">
+                    {{ 'atriametal_cookie_consent.banner.text'|trans }}
+                    {% if privacy_policy_url %}
+                        <a class="cookie-consent__link" href="{{ privacy_policy_url }}">{{ 'atriametal_cookie_consent.ui.learn_more'|trans }}</a>
+                    {% endif %}
+                </p>
+                <p class="cookie-consent__error" data-cookie-consent-error role="alert" hidden>{{ 'atriametal_cookie_consent.ui.error'|trans }}</p>
+            </div>
+            <div class="cookie-consent__actions">
+                <button type="button" class="cookie-consent__button" data-cookie-consent-action="reject-all">{{ 'atriametal_cookie_consent.ui.reject_all'|trans }}</button>
+                <button type="button" class="cookie-consent__button" data-cookie-consent-action="accept-all">{{ 'atriametal_cookie_consent.ui.accept_all'|trans }}</button>
+                <button type="button" class="cookie-consent__button cookie-consent__button--text" data-cookie-consent-action="open" aria-haspopup="dialog">{{ 'atriametal_cookie_consent.ui.customize'|trans }}</button>
+            </div>
+        </div>
+    </section>
+
+    <dialog class="cookie-consent__dialog" data-cookie-consent-dialog aria-labelledby="cookie-consent-dialog-title">
+        <div class="cookie-consent__dialog-header">
+            <h2 class="cookie-consent__title" id="cookie-consent-dialog-title">{{ 'atriametal_cookie_consent.preferences.title'|trans }}</h2>
+            <button type="button" class="cookie-consent__close" data-cookie-consent-action="close" aria-label="{{ 'atriametal_cookie_consent.ui.close'|trans }}">
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+            </button>
+        </div>
+
+        <div class="cookie-consent__dialog-body">
+            <p class="cookie-consent__text">
+                {{ 'atriametal_cookie_consent.preferences.text'|trans }}
+                {% if privacy_policy_url %}
+                    <a class="cookie-consent__link" href="{{ privacy_policy_url }}">{{ 'atriametal_cookie_consent.ui.learn_more'|trans }}</a>
+                {% endif %}
+            </p>
+
+            <ul class="cookie-consent__categories">
+                {% for category in cookie_consent_categories() %}
+                    {% set id = 'cookie-consent-category-' ~ category.name %}
+                    <li class="cookie-consent__category">
+                        <div class="cookie-consent__category-header">
+                            {% set label = ('atriametal_cookie_consent.categories.' ~ category.name ~ '.label')|trans %}
+                            {% if category.required %}
+                                <span class="cookie-consent__category-label">{{ label }}</span>
+                                <span class="cookie-consent__always-active">{{ 'atriametal_cookie_consent.ui.always_active'|trans }}</span>
+                            {% else %}
+                                <label class="cookie-consent__category-label" for="{{ id }}">{{ label }}</label>
+                                <input type="checkbox" class="cookie-consent__switch" role="switch" id="{{ id }}" value="{{ category.name }}" data-cookie-consent-category-input aria-describedby="{{ id }}-description">
+                            {% endif %}
+                        </div>
+                        <p class="cookie-consent__category-description" id="{{ id }}-description">
+                            {{ ('atriametal_cookie_consent.categories.' ~ category.name ~ '.description')|trans }}
+                        </p>
+                        {% if category.services is not empty %}
+                            <p class="cookie-consent__services">{{ 'atriametal_cookie_consent.ui.services'|trans({ '%services%': category.services|join(', ') }) }}</p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <p class="cookie-consent__error" data-cookie-consent-error role="alert" hidden>{{ 'atriametal_cookie_consent.ui.error'|trans }}</p>
+            <p class="cookie-consent__consent-id" data-cookie-consent-id-container hidden>
+                {{ 'atriametal_cookie_consent.ui.consent_id'|trans }} <span data-cookie-consent-id></span>
+            </p>
+        </div>
+
+        <div class="cookie-consent__dialog-footer">
+            <button type="button" class="cookie-consent__button cookie-consent__button--outline" data-cookie-consent-action="reject-all">{{ 'atriametal_cookie_consent.ui.reject_all'|trans }}</button>
+            <button type="button" class="cookie-consent__button cookie-consent__button--outline" data-cookie-consent-action="accept-all">{{ 'atriametal_cookie_consent.ui.accept_all'|trans }}</button>
+            <button type="button" class="cookie-consent__button" data-cookie-consent-action="save">{{ 'atriametal_cookie_consent.ui.save'|trans }}</button>
+        </div>
+    </dialog>
+
+    {% for category in optional_categories %}
+        {% set label = ('atriametal_cookie_consent.categories.' ~ category.name ~ '.label')|trans %}
+        <template data-cookie-consent-placeholder="{{ category.name }}">
+            <div class="cookie-consent-placeholder" data-cookie-consent-placeholder-of="{{ category.name }}">
+                <p class="cookie-consent-placeholder__text"
+                   data-cookie-consent-placeholder-text
+                   data-with-service="{{ 'atriametal_cookie_consent.placeholder.text_with_service'|trans({ '%service%': '{service}' }) }}">
+                    {{- 'atriametal_cookie_consent.placeholder.text'|trans -}}
+                </p>
+                <button type="button" class="cookie-consent__button" data-cookie-consent-action="allow" data-cookie-consent-category="{{ category.name }}">
+                    {{- 'atriametal_cookie_consent.placeholder.allow'|trans({ '%category%': label }) -}}
+                </button>
+                <button type="button" class="cookie-consent__button cookie-consent__button--text" data-cookie-consent-action="open" aria-haspopup="dialog">
+                    {{- 'atriametal_cookie_consent.ui.manage'|trans -}}
+                </button>
+            </div>
+        </template>
+    {% endfor %}
+
+    <p class="cookie-consent__status" data-cookie-consent-status role="status" data-saved="{{ 'atriametal_cookie_consent.ui.saved'|trans }}"></p>
+</div>

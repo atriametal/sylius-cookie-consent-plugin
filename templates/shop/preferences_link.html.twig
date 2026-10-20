@@ -1,0 +1,4 @@
+{# Lets the visitor change or withdraw the consent at any time: render it in the footer of every page. #}
+<button type="button" class="{{ class|default('cookie-consent-link') }}" data-cookie-consent-action="open" aria-haspopup="dialog">
+    {{- 'atriametal_cookie_consent.ui.manage'|trans -}}
+</button>

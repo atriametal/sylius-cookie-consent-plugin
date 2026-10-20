@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '0 1 * * 6' # Every Saturday, to catch new Sylius releases
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      # The combinations tested by Sylius itself, within the PHP and Symfony versions required by the plugin
+      # (PHP 8.2 or later, Symfony 5.4, 6.4, 7.4 or 8). Symfony 8 requires PHP 8.4.1 or later.
+      matrix:
+        include:
+          - { sylius: '~1.14.0', symfony: '~5.4.0', php: '8.2' }
+          - { sylius: '~1.14.0', symfony: '~6.4.0', php: '8.3' }
+          - { sylius: '~2.0.0', symfony: '~6.4.0', php: '8.2' }
+          - { sylius: '~2.0.0', symfony: '~7.4.0', php: '8.3' }
+          - { sylius: '~2.1.0', symfony: '~6.4.0', php: '8.3' }
+          - { sylius: '~2.1.0', symfony: '~7.4.0', php: '8.4' }
+          - { sylius: '~2.2.0', symfony: '~6.4.0', php: '8.3' }
+          - { sylius: '~2.2.0', symfony: '~7.4.0', php: '8.5' }
+          - { sylius: '~2.3.0', symfony: '~6.4.0', php: '8.4' }
+          - { sylius: '~2.3.0', symfony: '~7.4.0', php: '8.5' }
+          - { sylius: '~2.3.0', symfony: '~8.1.0', php: '8.5' }
+    name: Sylius ${{ matrix.sylius }}, Symfony ${{ matrix.symfony }}, PHP ${{ matrix.php }}
+    env:
+      APP_ENV: test
+      DATABASE_URL: mysql://root:root@127.0.0.1:3306/sylius_cookie_consent_plugin_test
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports: ['3306:3306']
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          extensions: intl, gd, exif, fileinfo
+          tools: flex
+      - name: Validate composer.json
+        run: composer validate --strict --no-check-lock
+      - name: Restrict the Sylius and Symfony versions
+        run: |
+          composer config extra.symfony.require "${{ matrix.symfony }}"
+          composer require --no-update --no-interaction "sylius/sylius:${{ matrix.sylius }}"
+      - uses: ramsey/composer-install@v3
+      - name: Coding standard
+        run: vendor/bin/ecs check
+      - name: Static analysis
+        run: vendor/bin/phpstan analyse --no-progress
+      - name: Unit tests
+        run: vendor/bin/phpunit --testsuite unit
+      - name: Create the database
+        run: |
+          vendor/bin/console doctrine:database:create
+          vendor/bin/console doctrine:schema:create
+      - name: Integration tests
+        run: vendor/bin/phpunit --testsuite integration
+      - name: Validate container
+        run: vendor/bin/console lint:container
+
+  javascript:
+    runs-on: ubuntu-latest
+    name: JavaScript
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+      - name: Unit tests
+        run: node --test tests/Js/*.test.js
+
+  # The single check required by the protection of main, whatever the jobs above.
+  ci-passed:
+    name: CI passed
+    if: always()
+    needs: [tests, javascript]
+    runs-on: ubuntu-latest
+    steps:
+      - run: test "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped') }}" = false

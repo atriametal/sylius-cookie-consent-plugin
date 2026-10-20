@@ -1,0 +1,6 @@
+atriametal_cookie_consent_shop:
+    resource: '@AtriametalSyliusCookieConsentPlugin/config/routes/shop.php'
+
+atriametal_cookie_consent_admin:
+    resource: '@AtriametalSyliusCookieConsentPlugin/config/routes/admin.php'
+    prefix: /admin

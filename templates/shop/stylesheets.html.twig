@@ -1,0 +1,10 @@
+<link rel="stylesheet" href="{{ asset('bundles/atriametalsyliuscookieconsentplugin/cookie-consent.css') }}">
+{% set google_consent_mode_signals = cookie_consent_client_config().googleConsentMode %}
+{% if google_consent_mode_signals is not empty %}
+    {# Denies every signal before a Google tag loads; the browser script then sends the choice of the visitor. #}
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('consent', 'default', {{ google_consent_mode_signals|map(category => 'denied')|merge({ wait_for_update: 500 })|json_encode|raw }});
+    </script>
+{% endif %}

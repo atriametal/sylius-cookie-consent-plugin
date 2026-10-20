@@ -1,0 +1,21 @@
+includes:
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-symfony/extension.neon
+
+parameters:
+    level: max
+    paths:
+        - config
+        - migrations
+        - src
+        - tests
+
+    # The plugin supports several Sylius major versions.
+    dynamicConstantNames:
+        - Sylius\Bundle\CoreBundle\SyliusCoreBundle::MAJOR_VERSION
+
+    ignoreErrors:
+        # Doctrine assigns the identifiers of the entities.
+        -
+            identifier: property.unusedType
+            path: src/Entity/*

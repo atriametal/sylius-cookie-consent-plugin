@@ -1,0 +1,46 @@
+atriametal_cookie_consent:
+    banner:
+        title: Vos cookies, votre choix
+        text: >-
+            Avec votre accord, nous utilisons des cookies pour mesurer l'audience de la boutique, afficher des vidéos
+            et mesurer nos publicités. Vous pouvez changer d'avis à tout moment depuis le lien « Gestion des cookies »
+            en bas de chaque page.
+    preferences:
+        title: Gestion des cookies
+        text: Choisissez les cookies que vous acceptez. Votre choix s'applique à toute la boutique.
+    categories:
+        necessary:
+            label: Indispensables
+            description: Panier, compte client, paiement sécurisé et mémorisation de votre choix. La boutique ne fonctionne pas sans eux.
+        analytics:
+            label: Mesure d'audience
+            description: Savoir quelles pages sont consultées, pour améliorer la boutique.
+        marketing:
+            label: Publicité
+            description: Mesurer l'efficacité de nos publicités et vous les présenter sur d'autres sites.
+        media:
+            label: Vidéos
+            description: Lire les vidéos hébergées par des services tiers. Ces services déposent leurs propres cookies.
+    placeholder:
+        text: Ce contenu est hébergé par un service tiers, qui dépose des cookies.
+        text_with_service: 'Ce contenu est hébergé par {service}, qui dépose des cookies.'
+        allow: 'Autoriser : %category%'
+    ui:
+        accept_all: Tout accepter
+        reject_all: Tout refuser
+        customize: Personnaliser
+        save: Enregistrer mes choix
+        close: Fermer
+        manage: Gestion des cookies
+        learn_more: En savoir plus
+        always_active: Toujours actifs
+        services: 'Services : %services%'
+        consent_id: 'Identifiant de votre consentement :'
+        saved: Vos choix sont enregistrés.
+        error: Votre choix n'a pas pu être enregistré. Vérifiez votre connexion, puis réessayez.
+        consent_records: Consentements cookies
+        consent_records_subheader: Preuve des choix des visiteurs
+        consent_id_column: Identifiant de consentement
+        date: Date
+        granted_categories: Finalités acceptées
+        policy_version: Version de la politique

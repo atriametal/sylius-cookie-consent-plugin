@@ -1,0 +1,46 @@
+atriametal_cookie_consent:
+    banner:
+        title: Ihre Cookies, Ihre Wahl
+        text: >-
+            Mit Ihrer Einwilligung verwenden wir Cookies, um die Nutzung des Shops zu messen, Videos anzuzeigen und
+            unsere Werbung zu messen. Sie können Ihre Wahl jederzeit über den Link „Cookie-Einstellungen“ unten auf
+            jeder Seite ändern.
+    preferences:
+        title: Cookie-Einstellungen
+        text: Wählen Sie die Cookies, die Sie akzeptieren. Ihre Wahl gilt für den gesamten Shop.
+    categories:
+        necessary:
+            label: Notwendig
+            description: Warenkorb, Kundenkonto, sichere Zahlung und Speicherung Ihrer Wahl. Ohne sie funktioniert der Shop nicht.
+        analytics:
+            label: Reichweitenmessung
+            description: Erfahren, welche Seiten besucht werden, um den Shop zu verbessern.
+        marketing:
+            label: Werbung
+            description: Die Wirksamkeit unserer Werbung messen und sie Ihnen auf anderen Websites zeigen.
+        media:
+            label: Videos
+            description: Videos abspielen, die von Drittanbietern gehostet werden. Diese setzen eigene Cookies.
+    placeholder:
+        text: Dieser Inhalt wird von einem Drittanbieter gehostet, der Cookies setzt.
+        text_with_service: 'Dieser Inhalt wird von {service} gehostet, der Cookies setzt.'
+        allow: 'Erlauben: %category%'
+    ui:
+        accept_all: Alle akzeptieren
+        reject_all: Alle ablehnen
+        customize: Anpassen
+        save: Auswahl speichern
+        close: Schließen
+        manage: Cookie-Einstellungen
+        learn_more: Mehr erfahren
+        always_active: Immer aktiv
+        services: 'Dienste: %services%'
+        consent_id: 'Kennung Ihrer Einwilligung:'
+        saved: Ihre Auswahl wurde gespeichert.
+        error: Ihre Wahl konnte nicht gespeichert werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.
+        consent_records: Cookie-Einwilligungen
+        consent_records_subheader: Nachweis der Entscheidungen der Besucher
+        consent_id_column: Einwilligungskennung
+        date: Datum
+        granted_categories: Akzeptierte Zwecke
+        policy_version: Version der Richtlinie

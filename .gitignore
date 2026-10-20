@@ -1,0 +1,9 @@
+/vendor/
+/composer.lock
+/.phpunit.cache/
+/.idea/
+/.phpunit.result.cache
+/var/
+/tests/TestApplication/.env.local
+/tests/TestApplication/.env.*.local
+/.php-version

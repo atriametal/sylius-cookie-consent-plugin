@@ -1,0 +1,15 @@
+atriametal_sylius_cookie_consent:
+    policy_version: '2'
+    privacy_policy:
+        route: sylius_shop_homepage
+    categories:
+        necessary: { required: true }
+        analytics:
+            services: ['Google Analytics']
+            cookies: ['_ga', '_ga_*']
+        media:
+            services: ['YouTube']
+    google_consent_mode:
+        enabled: true
+        signals:
+            analytics_storage: analytics
