@@ -78,6 +78,20 @@ final class ShopTemplatesTest extends KernelTestCase
         );
     }
 
+    /**
+     * Google tags evaluate each event pushed to the data layer with the consent state of that moment: the events a
+     * page pushes before the browser script runs (a purchase on the thank you page) would be denied otherwise.
+     */
+    public function testTheGoogleTagsAreGrantedFromTheStartWhatTheVisitorAlreadyConsentedTo(): void
+    {
+        $consent = (string) json_encode(['id' => '0c7a3f9e-1b2d-4c5e-8f9a-0b1c2d3e4f5a', 'version' => '2', 'categories' => ['necessary', 'analytics'], 'date' => '2026-10-20T10:00:00+00:00']);
+
+        self::assertStringContainsString(
+            "gtag('consent', 'default', {\"analytics_storage\":\"granted\",\"wait_for_update\":500});",
+            self::render('stylesheets', ['cookie_consent' => $consent]),
+        );
+    }
+
     public function testATemplateCanTellWhetherTheVisitorConsented(): void
     {
         $consent = (string) json_encode(['id' => '0c7a3f9e-1b2d-4c5e-8f9a-0b1c2d3e4f5a', 'version' => '2', 'categories' => ['necessary', 'media'], 'date' => '2026-10-20T10:00:00+00:00']);
@@ -87,9 +101,12 @@ final class ShopTemplatesTest extends KernelTestCase
         self::assertSame(' ', self::renderTemplate($template, []));
     }
 
-    private static function render(string $template): string
+    /**
+     * @param array<string, string> $cookies
+     */
+    private static function render(string $template, array $cookies = []): string
     {
-        return self::renderTemplate(\sprintf("{{ include('@AtriametalSyliusCookieConsentPlugin/shop/%s.html.twig') }}", $template), []);
+        return self::renderTemplate(\sprintf("{{ include('@AtriametalSyliusCookieConsentPlugin/shop/%s.html.twig') }}", $template), $cookies);
     }
 
     /**

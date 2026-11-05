@@ -151,9 +151,11 @@ cached for every visitor.
 
 ### Google consent mode
 
-With `google_consent_mode.enabled`, the style sheet template denies the configured signals before any Google tag loads,
-and the script sends the choice of the visitor with `gtag('consent', 'update', …)`. Render the style sheet template
-before your Google tags in the `<head>`. The consent mode does not replace the blocking: without consent, Google tags
+With `google_consent_mode.enabled`, the style sheet template sets the default state of the configured signals before
+any Google tag loads: granted for what the visitor already consented to, denied otherwise. The script then sends each
+new choice with `gtag('consent', 'update', …)`. Render the style sheet template before your Google tags and before any
+event you push to the data layer: Google tags evaluate each event with the consent state of that moment. As it reads
+the consent cookie, do not render it in pages cached for every visitor. The consent mode does not replace the blocking: without consent, Google tags
 still send cookieless pings.
 
 ### JavaScript
