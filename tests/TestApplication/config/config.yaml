@@ -1,4 +1,4 @@
-atriametal_sylius_cookie_consent:
+florentin_garnier_cookie_consent:
     policy_version: '2'
     privacy_policy:
         route: sylius_shop_homepage

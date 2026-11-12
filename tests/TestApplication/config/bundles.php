@@ -12,5 +12,6 @@
 declare(strict_types=1);
 
 return [
+    FlorentinGarnier\CookieConsentBundle\FlorentinGarnierCookieConsentBundle::class => ['all' => true],
     Atriametal\SyliusCookieConsentPlugin\AtriametalSyliusCookieConsentPlugin::class => ['all' => true],
 ];

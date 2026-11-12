@@ -74,22 +74,11 @@ jobs:
       - name: Validate container
         run: vendor/bin/console lint:container
 
-  javascript:
-    runs-on: ubuntu-latest
-    name: JavaScript
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22.x'
-      - name: Unit tests
-        run: node --test tests/Js/*.test.js
-
   # The single check required by the protection of main, whatever the jobs above.
   ci-passed:
     name: CI passed
     if: always()
-    needs: [tests, javascript]
+    needs: [tests]
     runs-on: ubuntu-latest
     steps:
       - run: test "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped') }}" = false

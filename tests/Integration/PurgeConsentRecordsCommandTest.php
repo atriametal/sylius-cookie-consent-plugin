@@ -13,17 +13,14 @@ declare(strict_types=1);
 
 namespace Tests\Atriametal\SyliusCookieConsentPlugin\Integration;
 
-use Atriametal\SyliusCookieConsentPlugin\Command\PurgeConsentRecordsCommand;
 use Atriametal\SyliusCookieConsentPlugin\Entity\ConsentRecord;
-use Atriametal\SyliusCookieConsentPlugin\Repository\ConsentRecordRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-#[CoversClass(PurgeConsentRecordsCommand::class)]
-#[CoversClass(ConsentRecordRepository::class)]
+#[CoversClass(ConsentRecord::class)]
 final class PurgeConsentRecordsCommandTest extends KernelTestCase
 {
     public function testItRemovesTheRecordsOlderThanTheRetentionPeriod(): void
