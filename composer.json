@@ -51,26 +51,6 @@
         "symfony/runtime": "^5.4.21 || ^6.4 || ^7.4 || ^8.0",
         "symfony/twig-bridge": "^5.4.21 || ^6.4 || ^7.4 || ^8.0"
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../../FlorentinGarnier/cookie-consent",
-            "options": {
-                "versions": {
-                    "florentingarnier/cookie-consent": "0.1.0"
-                }
-            }
-        },
-        {
-            "type": "path",
-            "url": "../../FlorentinGarnier/cookie-consent-bundle",
-            "options": {
-                "versions": {
-                    "florentingarnier/cookie-consent-bundle": "0.1.0"
-                }
-            }
-        }
-    ],
     "autoload": {
         "psr-4": {
             "Atriametal\\SyliusCookieConsentPlugin\\": "src/",
