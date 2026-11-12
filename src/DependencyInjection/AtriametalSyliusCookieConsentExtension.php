@@ -13,19 +13,21 @@ declare(strict_types=1);
 
 namespace Atriametal\SyliusCookieConsentPlugin\DependencyInjection;
 
+use Atriametal\SyliusCookieConsentPlugin\Channel\SyliusChannelCodeProvider;
 use Atriametal\SyliusCookieConsentPlugin\Entity\ConsentRecord;
-use Atriametal\SyliusCookieConsentPlugin\Repository\ConsentRecordRepository;
 use Sylius\Bundle\CoreBundle\SyliusCoreBundle;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
+/**
+ * The consent is configured under florentin_garnier_cookie_consent, the key of the bundle.
+ */
 final class AtriametalSyliusCookieConsentExtension extends Extension implements PrependExtensionInterface
 {
-    private const TEMPLATES = '@AtriametalSyliusCookieConsentPlugin/shop/';
+    private const TEMPLATES = '@FlorentinGarnierCookieConsent/';
 
     /**
      * The banner is rendered at the top of the page, so that keyboard and screen reader users reach it first.
@@ -40,34 +42,17 @@ final class AtriametalSyliusCookieConsentExtension extends Extension implements 
 
     public function load(array $configs, ContainerBuilder $container): void
     {
-        /** @var array{policy_version: string, cookie: array{name: string, lifetime: int, domain: ?string}, privacy_policy: array{route: ?string, parameters: array<string, mixed>}, categories: array<string, array{required: bool, services: list<string>, cookies: list<string>}>, google_consent_mode: array{enabled: bool, signals: array<string, string>}, records: array{retention: int}} $config */
-        $config = $this->processConfiguration(new Configuration(), $configs);
-
-        if ($config['google_consent_mode']['enabled']) {
-            self::checkGoogleConsentModeSignals($config['google_consent_mode']['signals'], $config['categories']);
-        }
-
-        $parameters = [
-            'policy_version' => $config['policy_version'],
-            'categories' => $config['categories'],
-            'cookie.name' => $config['cookie']['name'],
-            'cookie.lifetime' => $config['cookie']['lifetime'],
-            'cookie.domain' => $config['cookie']['domain'],
-            'privacy_policy.route' => $config['privacy_policy']['route'],
-            'privacy_policy.parameters' => $config['privacy_policy']['parameters'],
-            'google_consent_mode.signals' => $config['google_consent_mode']['enabled'] ? $config['google_consent_mode']['signals'] : [],
-            'records.retention' => $config['records']['retention'],
-        ];
-        foreach ($parameters as $name => $value) {
-            $container->setParameter('atriametal_cookie_consent.' . $name, $value);
-        }
-
         (new PhpFileLoader($container, new FileLocator(\dirname(__DIR__, 2) . '/config')))->load('services.php');
     }
 
     public function prepend(ContainerBuilder $container): void
     {
         $pluginDirectory = \dirname(__DIR__, 2);
+
+        $container->prependExtensionConfig('florentin_garnier_cookie_consent', [
+            'records' => ['class' => ConsentRecord::class],
+            'channel_code_provider' => SyliusChannelCodeProvider::class,
+        ]);
 
         $container->prependExtensionConfig('doctrine', ['orm' => ['mappings' => ['AtriametalSyliusCookieConsentPlugin' => [
             'type' => 'xml',
@@ -79,7 +64,7 @@ final class AtriametalSyliusCookieConsentExtension extends Extension implements 
             'Atriametal\SyliusCookieConsentPlugin\Migrations' => $pluginDirectory . '/migrations',
         ]]);
         $container->prependExtensionConfig('sylius_resource', ['resources' => ['atriametal_cookie_consent.consent_record' => [
-            'classes' => ['model' => ConsentRecord::class, 'repository' => ConsentRecordRepository::class],
+            'classes' => ['model' => ConsentRecord::class],
         ]]]);
         $container->prependExtensionConfig('sylius_grid', ['grids' => ['atriametal_cookie_consent_admin_consent_record' => self::grid()]]);
 
@@ -122,18 +107,5 @@ final class AtriametalSyliusCookieConsentExtension extends Extension implements 
                 'createdAt' => ['type' => 'date', 'label' => 'atriametal_cookie_consent.ui.date'],
             ],
         ];
-    }
-
-    /**
-     * @param array<string, string> $signals
-     * @param array<string, mixed>  $categories
-     */
-    private static function checkGoogleConsentModeSignals(array $signals, array $categories): void
-    {
-        foreach ($signals as $signal => $category) {
-            if (!isset($categories[$category])) {
-                throw new InvalidConfigurationException(\sprintf('The Google consent mode signal "%s" refers to the "%s" category, which is not configured.', $signal, $category));
-            }
-        }
     }
 }

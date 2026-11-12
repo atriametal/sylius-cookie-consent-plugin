@@ -11,15 +11,11 @@
 
 declare(strict_types=1);
 
-use Atriametal\SyliusCookieConsentPlugin\Controller\SaveConsentAction;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 /*
- * Outside the locale prefix of the shop: the same address serves every locale.
+ * The route of the bundle receiving the choices of the visitors.
  */
 return static function (RoutingConfigurator $routes): void {
-    $routes->add('atriametal_cookie_consent_shop_save', '/cookie-consent')
-        ->controller(SaveConsentAction::class)
-        ->methods(['POST'])
-    ;
+    $routes->import('@FlorentinGarnierCookieConsentBundle/config/routes.php');
 };

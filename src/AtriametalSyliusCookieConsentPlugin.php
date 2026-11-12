@@ -21,7 +21,7 @@ final class AtriametalSyliusCookieConsentPlugin extends Bundle
     use SyliusPluginTrait;
 
     /**
-     * The plugin lives at the package root (config/, public/, templates/, translations/), not in src/.
+     * The plugin lives at the package root (config/, templates/, translations/), not in src/.
      */
     public function getPath(): string
     {

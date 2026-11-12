@@ -18,6 +18,22 @@ French data protection authority (CNIL):
 
 No external service, no build step: one module script and one style sheet, themable with CSS custom properties.
 
+The consent itself is provided by
+[florentingarnier/cookie-consent-bundle](https://github.com/FlorentinGarnier/cookie-consent-bundle), which works in
+any Symfony application. The plugin renders its banner in the shop, records the channel of each choice, lists the
+records in the admin and words the texts for a shop.
+
+| Package | Purpose |
+|---------|---------|
+| [florentingarnier/cookie-consent](https://github.com/FlorentinGarnier/cookie-consent) | The consent policy, the cookie and the records, for any PHP application |
+| [florentingarnier/cookie-consent-bundle](https://github.com/FlorentinGarnier/cookie-consent-bundle) | Symfony integration: banner, browser script, Doctrine records, console command |
+| **atriametal/sylius-cookie-consent-plugin** (this one) | Renders the banner in the Sylius shop and lists the records in the admin |
+
+## Upgrading from 0.1
+
+The configuration, the templates, the browser script and the translations moved to the bundle in 0.2.0: follow the
+[CHANGELOG](CHANGELOG.md#upgrading-from-01) to rename them.
+
 ## Requirements
 
 - Sylius 1.14 or 2.x, PHP 8.2 or later, and Symfony 5.4, 6.4, 7.4 or 8 within the versions supported by your
@@ -34,17 +50,19 @@ No external service, no build step: one module script and one style sheet, thema
    composer require atriametal/sylius-cookie-consent-plugin
    ```
 
-2. If you do not use Symfony Flex, enable the plugin:
+2. If you do not use Symfony Flex, enable the bundle and the plugin, in this order:
 
    ```php
    // config/bundles.php
    return [
        // ...
+       FlorentinGarnier\CookieConsentBundle\FlorentinGarnierCookieConsentBundle::class => ['all' => true],
        Atriametal\SyliusCookieConsentPlugin\AtriametalSyliusCookieConsentPlugin::class => ['all' => true],
    ];
    ```
 
-3. Import the routes. The shop route is outside the locale prefix; the admin route goes under the admin prefix:
+3. Import the routes. The shop route, which receives the choices, is outside the locale prefix; the admin route goes
+   under the admin prefix:
 
    ```yaml
    # config/routes/atriametal_sylius_cookie_consent.yaml
@@ -67,7 +85,7 @@ No external service, no build step: one module script and one style sheet, thema
    [Blocking](#blocking-scripts-and-embedded-contents)), and add the preferences link to your footer:
 
    ```twig
-   {{ include('@AtriametalSyliusCookieConsentPlugin/shop/preferences_link.html.twig') }}
+   {{ include('@FlorentinGarnierCookieConsent/preferences_link.html.twig') }}
    ```
 
 6. Remove the consent records older than the retention period every day, for instance with cron:
@@ -81,121 +99,49 @@ The banner, the style sheet and the script are rendered by the layout template e
 
 | Template | Sylius 1 template event | Sylius 2 hook |
 |----------|-------------------------|---------------|
-| `shop/stylesheets.html.twig` | `sylius.shop.layout.stylesheets` | `sylius_shop.base#stylesheets` |
-| `shop/banner.html.twig` | `sylius.shop.layout.before_body` | `sylius_shop.base.header` |
-| `shop/javascripts.html.twig` | `sylius.shop.layout.javascripts` | `sylius_shop.base#javascripts` |
+| `@FlorentinGarnierCookieConsent/stylesheets.html.twig` | `sylius.shop.layout.stylesheets` | `sylius_shop.base#stylesheets` |
+| `@FlorentinGarnierCookieConsent/banner.html.twig` | `sylius.shop.layout.before_body` | `sylius_shop.base.header` |
+| `@FlorentinGarnierCookieConsent/javascripts.html.twig` | `sylius.shop.layout.javascripts` | `sylius_shop.base#javascripts` |
+
+The blocks are named `atriametal_cookie_consent_stylesheets`, `atriametal_cookie_consent_banner` and
+`atriametal_cookie_consent_javascripts`.
 
 ## Configuration
 
+The consent is configured under `florentin_garnier_cookie_consent`: see the
+[bundle documentation](https://github.com/FlorentinGarnier/cookie-consent-bundle#configuration) for the categories, the cookie, the privacy policy page and the Google
+consent mode. The plugin sets `records.class` and `channel_code_provider`: leave them.
+
 ```yaml
-# config/packages/atriametal_sylius_cookie_consent.yaml
-atriametal_sylius_cookie_consent:
-    # Change it to ask every visitor again, for instance after adding a category or a service
+# config/packages/florentin_garnier_cookie_consent.yaml
+florentin_garnier_cookie_consent:
     policy_version: '1'
-    cookie:
-        name: cookie_consent
-        lifetime: 182 # days, 395 at most
-        domain: ~ # ".example.com" shares the consent between subdomains
     privacy_policy:
-        route: ~ # the page describing your cookies, linked from the banner
-        parameters: {}
-    # Replace the default categories: necessary (required), analytics, marketing and media
+        route: app_cookie_policy # the page describing your cookies, linked from the banner
     categories:
         necessary:
-            required: true # always granted: only for the cookies strictly necessary to the shop
+            required: true
         analytics:
-            services: ['Google Analytics'] # shown to the visitor
-            cookies: ['_ga', '_ga_*'] # deleted when the visitor withdraws the consent
+            services: ['Google Analytics']
+            cookies: ['_ga', '_ga_*']
         media:
             services: ['YouTube']
     google_consent_mode:
-        enabled: false
-        signals: # the category granting each signal
-            analytics_storage: analytics
-            ad_storage: marketing
-            ad_user_data: marketing
-            ad_personalization: marketing
-    records:
-        retention: 395 # days
+        enabled: true
 ```
 
-The label and the description of each category are translated from
-`atriametal_cookie_consent.categories.<name>.label` and `.description`, in the `messages` domain. The plugin
-translates the default categories in English, French and German. Override any text in your
-`translations/messages.<locale>.yaml`: the texts of the banner must describe the purposes you actually use.
+The bundle translates the texts in English, French and German; the plugin words those about the purposes for a shop.
+Override any text in your `translations/messages.<locale>.yaml`, under `florentin_garnier_cookie_consent`: the
+texts of the banner must describe the purposes you actually use.
 
-## Blocking scripts and embedded contents
-
-A script runs once a visitor consents to any of the categories listed in its `data-cookie-consent` attribute.
-Give it the `text/plain` type, so that the browser does not run it before:
-
-```html
-<script type="text/plain" data-cookie-consent="analytics marketing">
-    (function(w,d,s,l,i){ /* Google Tag Manager */ })(window,document,'script','dataLayer','GTM-XXXX');
-</script>
-<script type="text/plain" data-cookie-consent="analytics" src="https://example.com/tracker.js" async></script>
-```
-
-A module script keeps its type in `data-type="module"`.
-
-An embedded content gets its address from `data-src`. Until the visitor consents, a placeholder explains why it is
-hidden and lets the visitor allow its category; `data-cookie-consent-service` names the third party in it:
-
-```html
-<iframe data-cookie-consent="media" data-cookie-consent-service="YouTube"
-        data-src="https://www.youtube-nocookie.com/embed/VIDEO_ID" title="…"></iframe>
-```
-
-On the server side, `cookie_consent_granted('media')` tells whether the visitor consented. Do not use it in pages
-cached for every visitor.
-
-### Google consent mode
-
-With `google_consent_mode.enabled`, the style sheet template sets the default state of the configured signals before
-any Google tag loads: granted for what the visitor already consented to, denied otherwise. The script then sends each
-new choice with `gtag('consent', 'update', …)`. Render the style sheet template before your Google tags and before any
-event you push to the data layer: Google tags evaluate each event with the consent state of that moment. As it reads
-the consent cookie, do not render it in pages cached for every visitor. The consent mode does not replace the blocking: without consent, Google tags
-still send cookieless pings.
-
-### JavaScript
-
-```js
-window.cookieConsent.isGranted('analytics'); // once the script has run
-window.cookieConsent.open(); // opens the preferences
-
-// Dispatched when the script starts, then after each choice
-document.addEventListener('cookie-consent:update', (event) => {
-  if (event.detail.categories.includes('analytics')) {
-    // start what needs this consent
-  }
-});
-```
-
-Any element with `data-cookie-consent-action="open"` opens the preferences. A script cannot be unloaded: when the
-visitor withdraws a consent, the page is loaded again, after the cookies of the category are deleted.
-
-## Theming
-
-Override the custom properties of `.cookie-consent` and `.cookie-consent-placeholder`:
-
-```css
-.cookie-consent,
-.cookie-consent-placeholder {
-  --cookie-consent-font-family: 'Inter', sans-serif;
-  --cookie-consent-text: #121212;
-  --cookie-consent-button-background: #121212;
-  --cookie-consent-radius: 0;
-}
-```
-
-See [public/cookie-consent.css](public/cookie-consent.css) for the full list. Keep accepting and rejecting with the
-same style.
+To block your scripts and embedded contents until the visitor consents, to use the Google consent mode, the
+JavaScript API or to theme the banner, see the bundle documentation:
+[blocking](https://github.com/FlorentinGarnier/cookie-consent-bundle#blocking-scripts-and-embedded-contents), [theming](https://github.com/FlorentinGarnier/cookie-consent-bundle#theming).
 
 ## Proof of consent
 
 Each choice is recorded with a random identifier, the version of the policy, the granted categories, the date and the
-channel: no IP address, no customer. The identifier stays the same when the visitor changes the choice, and is
+code of the channel: no IP address, no customer. The identifier stays the same when the visitor changes the choice, and is
 shown in the preferences, so that the visitor can refer to it. The admin lists the records under Configuration ›
 Cookie consents.
 
@@ -213,7 +159,6 @@ docker compose up -d # MySQL on port 3306, or set MYSQL_PORT
 vendor/bin/console doctrine:database:create --env=test
 vendor/bin/console doctrine:schema:create --env=test
 vendor/bin/phpunit
-node --test tests/Js/*.test.js
 vendor/bin/ecs check
 vendor/bin/phpstan analyse
 ```

@@ -12,14 +12,14 @@ Open an issue with the [bug report or feature request form](https://github.com/a
 
 1. Fork the repository and create a branch from `main`.
 2. Install the dependencies: `composer install`.
-3. Write a test that fails without your change, then make it pass: `vendor/bin/phpunit` for PHP, `node --test tests/Js/*.test.js` for
-   the JavaScript.
+3. Write a test that fails without your change, then make it pass: `vendor/bin/phpunit`.
 4. Check the code style and the types: `vendor/bin/ecs check` (Sylius coding standard) and
    `vendor/bin/phpstan analyse`. Keep `declare(strict_types=1);` and the license header in every PHP file.
    The plugin supports Sylius 1.14 and 2.x: see the README to run the tests against another version.
 5. Describe the change in the `Unreleased` section of [CHANGELOG.md](CHANGELOG.md).
 6. Open the pull request, explaining the problem it solves.
 
-Keep pull requests focused: one change per pull request is easier to review. Changes to the format of the consent cookie
-or to the JavaScript API are breaking changes: they would ask every visitor for consent again, or break the
-integrations of the applications.
+Keep pull requests focused: one change per pull request is easier to review. The consent policy, the cookie, the banner
+and the browser script live in [florentingarnier/cookie-consent](https://github.com/FlorentinGarnier/cookie-consent)
+and [florentingarnier/cookie-consent-bundle](https://github.com/FlorentinGarnier/cookie-consent-bundle): propose their
+changes there.

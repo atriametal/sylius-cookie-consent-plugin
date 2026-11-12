@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace Tests\Atriametal\SyliusCookieConsentPlugin\Integration;
 
-use Atriametal\SyliusCookieConsentPlugin\Twig\CookieConsentExtension;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -25,7 +24,7 @@ use Twig\Environment;
  * The test application configures the policy version "2" with the necessary, analytics and media categories, a
  * privacy policy and the Google consent mode for the analytics_storage signal.
  */
-#[CoversClass(CookieConsentExtension::class)]
+#[CoversNothing]
 final class ShopTemplatesTest extends KernelTestCase
 {
     public function testTheBannerGivesTheBrowserScriptItsConfiguration(): void
@@ -55,6 +54,14 @@ final class ShopTemplatesTest extends KernelTestCase
 
         self::assertStringContainsString('<button type="button" class="cookie-consent__button" data-cookie-consent-action="reject-all">Reject all</button>', $html);
         self::assertStringContainsString('<button type="button" class="cookie-consent__button" data-cookie-consent-action="accept-all">Accept all</button>', $html);
+    }
+
+    public function testTheTextsDescribeThePurposesOfAShop(): void
+    {
+        $html = self::render('banner');
+
+        self::assertStringContainsString('we use cookies to measure the audience of the shop', $html);
+        self::assertStringContainsString('Cart, customer account, secure payment and your cookie choice.', $html);
     }
 
     public function testThePreferencesLetTheVisitorChooseEachOptionalCategory(): void
@@ -106,7 +113,7 @@ final class ShopTemplatesTest extends KernelTestCase
      */
     private static function render(string $template, array $cookies = []): string
     {
-        return self::renderTemplate(\sprintf("{{ include('@AtriametalSyliusCookieConsentPlugin/shop/%s.html.twig') }}", $template), $cookies);
+        return self::renderTemplate(\sprintf("{{ include('@FlorentinGarnierCookieConsent/%s.html.twig') }}", $template), $cookies);
     }
 
     /**

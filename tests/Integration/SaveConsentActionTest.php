@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Tests\Atriametal\SyliusCookieConsentPlugin\Integration;
 
-use Atriametal\SyliusCookieConsentPlugin\Controller\SaveConsentAction;
 use Atriametal\SyliusCookieConsentPlugin\Entity\ConsentRecord;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -25,7 +24,6 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * The test application configures the policy version "2" with the necessary, analytics and media categories.
  */
-#[CoversClass(SaveConsentAction::class)]
 #[CoversClass(ConsentRecord::class)]
 final class SaveConsentActionTest extends WebTestCase
 {

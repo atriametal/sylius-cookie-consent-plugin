@@ -13,59 +13,12 @@ declare(strict_types=1);
 
 namespace Atriametal\SyliusCookieConsentPlugin\Entity;
 
-use Atriametal\SyliusCookieConsentPlugin\Consent\Consent;
+use FlorentinGarnier\CookieConsent\ConsentRecord as BaseConsentRecord;
+use Sylius\Resource\Model\ResourceInterface;
 
 /**
- * The proof of a choice of a visitor. It holds no personal data: neither the IP address nor the customer.
+ * The record of the bundle, as a Sylius resource listed in the admin. Its table keeps the name of the earlier versions.
  */
-class ConsentRecord implements ConsentRecordInterface
+class ConsentRecord extends BaseConsentRecord implements ResourceInterface
 {
-    private ?int $id = null;
-
-    /**
-     * @param list<string> $categories
-     */
-    public function __construct(
-        private string $consentId,
-        private string $policyVersion,
-        private array $categories,
-        private \DateTimeImmutable $createdAt,
-        private ?string $channelCode = null,
-    ) {
-    }
-
-    public static function fromConsent(Consent $consent, ?string $channelCode): self
-    {
-        return new self($consent->id, $consent->policyVersion, $consent->categories, $consent->givenAt, $channelCode);
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getConsentId(): string
-    {
-        return $this->consentId;
-    }
-
-    public function getPolicyVersion(): string
-    {
-        return $this->policyVersion;
-    }
-
-    public function getCategories(): array
-    {
-        return $this->categories;
-    }
-
-    public function getCreatedAt(): \DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function getChannelCode(): ?string
-    {
-        return $this->channelCode;
-    }
 }
